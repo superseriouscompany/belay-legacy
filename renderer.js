@@ -7,24 +7,34 @@ const timeDisplay = document.querySelector('.js-timeDisplay');
 const foothold    = document.querySelector('.js-foothold');
 const ipc         = require('electron').ipcRenderer;
 
-const start = +new Date;
+const start  = +new Date;
+let stack    = [];
 
 window.input = input;
 
 setInterval(function() {
-  let diff = +new Date - start;
+  if( !stack.length ) { return; }
+  let diff = +new Date - stack[0].start;
 
   timeDisplay.innerHTML = `${Math.floor(diff / 1000)}s`
 }, 1000);
 
-ipc.on('focus', function(event , data) {
-  input.focus();
-});
-
 input.addEventListener('keypress', function(event) {
   if( event.which == 13 ) {
-    console.log("Got enter");
+    stack.unshift({start: +new Date, name: input.value})
     event.preventDefault();
+    input.style.display = 'hidden';
     return false;
   }
 })
+
+function prepTextbox() {
+  document.body.addEventListener('keypress', function showTextbox(event) {
+    if( !event.key.match(/^[A-z0-9]$/) ) { return; }
+
+    document.body.removeEventListener('keypress', showTextbox);
+    input.style.display = 'block';
+    input.value = event.key;
+  })
+}
+prepTextbox();

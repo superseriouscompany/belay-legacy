@@ -1,5 +1,11 @@
+* { box-sizing: border-box; }
+html, body, .center { height: 100%; margin: 0; }
 body { font-family: Helvetica; }
+.center { display: flex; flex-wrap: wrap; flex: 1; flex-direction: column; justify-content: center; align-content: center; color: mediumpurple; text-align: center; }
 .timeDisplay { position: absolute; bottom: 1em; right: 1em; color: gainsboro; font-family: Helvetica; }
-.now { font-family: 'Permanent Marker', cursive; font-size: 96px; letter-spacing: 13px; }
-.next { border: 0; font-family: 'Permanent Marker', cursive; font-size: 96px; letter-spacing: 13px; color: mediumpurple; text-align: center; }
-.center { flex: 1; flex-direction: column; justify-content: center; color: mediumpurple; text-align: center; }
+.foothold { position: absolute; top: 1em; width: 100%; text-align: center; color: gainsboro; }
+
+.now { font-family: 'Permanent Marker', cursive; font-size: 96px; letter-spacing: 13px; margin-top: -1em; }
+.next { border: 0; font-family: 'Permanent Marker', cursive; font-size: 96px; letter-spacing: 13px; color: mediumpurple; text-align: center; margin-top: -1em; }
+
+textarea { display: none; }
