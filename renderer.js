@@ -11,6 +11,7 @@ const ipc         = require('electron').ipcRenderer;
 const start  = +new Date;
 let stack    = [];
 
+window.stack = stack;
 window.input = input;
 
 setInterval(function() {
@@ -35,36 +36,20 @@ input.addEventListener('keypress', function(event) {
 })
 
 function resize() {
-  input.style.height = 'auto';
-  input.style.height = input.scrollHeight + 'px';
+  // input.style.height = 'auto';
+  // input.style.height = input.scrollHeight + 'px';
 }
 input.addEventListener('change', resize);
-input.addEventListener('cut', () => setTimeout(resize));
-input.addEventListener('paste', () => setTimeout(resize));
-input.addEventListener('drop', () => setTimeout(resize));
+input.addEventListener('cut', ()     => setTimeout(resize));
+input.addEventListener('paste', ()   => setTimeout(resize));
+input.addEventListener('drop', ()    => setTimeout(resize));
 input.addEventListener('keydown', () => setTimeout(resize));
 
-function prepTextbox() {
-  document.body.addEventListener('keypress', function showTextbox(event) {
-    if( !event.key.match(/^[A-z0-9]$/) ) { return; }
-
-    document.body.removeEventListener('keypress', showTextbox);
-    listen();
-  })
-}
-
 function push(name) {
-  stack.unshift({start: +new Date, name: name});
-  console.log("stack is now", stack);
-  cancel();
-}
+  if( !name ) { console.warn("No name provided"); return cancel(); }
 
-function listen() {
-  input.style.display = 'block';
-  input.value         = event.key;
-  now.style.display   = 'none';
-  now.innerHTML       = '';
-  foothold.innerHTML  = stack[0].name;
+  stack.unshift({start: +new Date, name: name});
+  cancel();
 }
 
 function cancel() {
@@ -75,7 +60,29 @@ function cancel() {
   if( stack[1] ) {
     foothold.innerHTML  = stack[1].name;
   }
-  prepTextbox();
+  listen();
+}
+
+function startInput() {
+  // Show and focus input.
+  input.style.display = 'block';
+  input.focus();
+
+  // Hide and clear displayed text.
+  now.style.display   = 'none';
+  now.innerHTML       = '';
+
+  // Set foothold to currently displayed text.
+  foothold.innerHTML  = stack[0].name;
+}
+
+function listen() {
+  document.body.addEventListener('keypress', function showTextbox(event) {
+    if( !event.key.match(/^[A-z0-9]$/) ) { return; }
+
+    startInput();
+    document.body.removeEventListener('keypress', showTextbox);
+  })
 }
 
 push('do one thing');
