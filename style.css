@@ -1,2 +1,5 @@
-body { font-family: 'Helvetica' }
-.timeDisplay { position: absolute; bottom: 1em; right: 1em; color: gainsboro; }
+body { font-family: Helvetica; }
+.timeDisplay { position: absolute; bottom: 1em; right: 1em; color: gainsboro; font-family: Helvetica; }
+.now { font-family: 'Permanent Marker', cursive; font-size: 96px; letter-spacing: 13px; }
+.next { border: 0; font-family: 'Permanent Marker', cursive; font-size: 96px; letter-spacing: 13px; color: mediumpurple; text-align: center; }
+.center { flex: 1; flex-direction: column; justify-content: center; color: mediumpurple; text-align: center; }

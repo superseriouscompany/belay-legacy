@@ -5,7 +5,9 @@ const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 
 const path = require('path')
-const url = require('url')
+const url  = require('url')
+const ipc  = require('electron').ipcMain
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -25,6 +27,13 @@ function createWindow () {
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('focus');
+  })
+  mainWindow.on('focus', function() {
+    mainWindow.webContents.send('focus');
+  })
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
