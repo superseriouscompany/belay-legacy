@@ -58,8 +58,7 @@ input.addEventListener('keydown', () => setTimeout(resize));
 
 function push(name) {
   if( !name ) { console.warn("No name provided"); return cancel(); }
-
-  stack.unshift({start: +new Date, name: name});
+  stack.unshift({start: +new Date, name: name, fontSize: window.getComputedStyle(input)['font-size']});
   cancel();
 }
 
@@ -68,6 +67,9 @@ function cancel() {
   input.value         = '';
   now.style.display   = 'block';
   now.innerHTML       = stack[0].name;
+  if( stack[0].fontSize ) {
+    now.style.fontSize = stack[0].fontSize;
+  }
   if( stack[1] ) {
     foothold.innerHTML  = stack[1].name;
   }
