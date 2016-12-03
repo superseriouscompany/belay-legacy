@@ -4,7 +4,8 @@
   "description": "Belay App",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "package": "electron-packager ./ Belay --platform=darwin --out ~/Desktop/Belay --version 1.0.0 --overwrite --icon=./img/icon.icns"
   },
   "repository": "https://github.com/superseriouscompany/belay",
   "keywords": [
@@ -15,6 +16,7 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^1.4.1"
+    "electron": "^1.4.1",
+    "electron-packager": "^8.3.0"
   }
 }
