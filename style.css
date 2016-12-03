@@ -5,7 +5,8 @@ body { font-family: Helvetica; }
 .timeDisplay { position: absolute; bottom: 1em; right: 1em; color: gainsboro; font-family: Helvetica; }
 .foothold { position: absolute; top: 1em; width: 100%; text-align: center; color: gainsboro; }
 
-.now { font-family: 'Permanent Marker', cursive; font-size: 96px; letter-spacing: 13px; margin-top: -1em; }
-.next { border: 0; font-family: 'Permanent Marker', cursive; font-size: 96px; letter-spacing: 13px; color: mediumpurple; text-align: center; margin-top: -1em; }
+.mainFocus { font-family: 'Permanent Marker', cursive; font-size: 96px; letter-spacing: 13px; line-height: .88em; margin-top: -1em; color: mediumpurple; }
+
+.next { border: 0; text-align: center;}
 
 textarea { display: none; height: 140px; }
