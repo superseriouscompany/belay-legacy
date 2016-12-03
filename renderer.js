@@ -62,16 +62,25 @@ function push(name) {
   cancel();
 }
 
+function pop() {
+  stack.shift();
+  cancel();
+}
+
 function cancel() {
   input.style.display = 'none';
   input.value         = '';
   now.style.display   = 'block';
-  now.innerHTML       = stack[0].name;
-  if( stack[0].fontSize ) {
-    now.style.fontSize = stack[0].fontSize;
-  }
-  if( stack[1] ) {
-    foothold.innerHTML  = stack[1].name;
+  if( stack.length ) {
+    now.innerHTML = stack[0].name;
+    if( stack[0].fontSize ) {
+      now.style.fontSize = stack[0].fontSize;
+    }
+    if( stack[1] ) {
+      foothold.innerHTML  = stack[1].name;
+    }
+  } else {
+    now.innerHTML = 'Do one thing.'
   }
   listen();
 }
@@ -86,7 +95,7 @@ function startInput() {
   now.innerHTML       = '';
 
   // Set foothold to currently displayed text.
-  foothold.innerHTML  = stack[0].name;
+  foothold.innerHTML  = stack[0] && stack[0].name || "";
 }
 
 function listen() {
@@ -95,7 +104,18 @@ function listen() {
 
     startInput();
     document.body.removeEventListener('keypress', showTextbox);
+    document.body.removeEventListener('keydown', complete);
   })
+
+  document.body.addEventListener('keydown', complete);
+
+  function complete(event) {
+    if( event.which != 8 ) { return; }
+
+    event.preventDefault();
+    pop();
+    return false;
+  }
 }
 
-push('do one thing');
+push('Do one thing.');
