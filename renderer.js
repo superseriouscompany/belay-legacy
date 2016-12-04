@@ -15,37 +15,6 @@ const defaultFontSize = parseInt(window.getComputedStyle(input)['font-size']);
 const start  = +new Date;
 let stack    = [];
 
-setInterval(function() {
-  if( !stack.length ) { return; }
-  let diff = (+new Date - stack[0].start)/1000;
-
-  const hours   = Math.floor(diff / 3600);
-  const minutes = Math.floor((diff % 3600) / 60);
-  const seconds = Math.floor(diff % 60);
-
-  if( hours ) {
-    timeDisplay.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
-  } else if( minutes ) {
-    timeDisplay.innerHTML = `${minutes}m ${seconds}s`;
-  } else {
-    timeDisplay.innerHTML = `${seconds}s`;
-  }
-}, 1000);
-
-function resize() {
-  input.style.height = 'auto';
-  input.style.height = input.scrollHeight + 'px';
-  // These values are arbitrary and can and should be tweaked
-  if( input.scrollHeight > document.body.clientHeight * .75 ) {
-    const fontSize = parseInt(window.getComputedStyle(input)['font-size']) * .9;
-    input.style.fontSize = `${fontSize}px`;
-  }
-  if( input.scrollHeight < document.body.clientHeight * .5 ) {
-    const fontSize = Math.min(defaultFontSize, parseInt(window.getComputedStyle(input)['font-size']) * 1.5);
-    input.style.fontSize = `${fontSize}px`;
-  }
-}
-
 function render() {
   input.style.display = 'none';
   input.value         = '';
@@ -65,20 +34,20 @@ function render() {
 
 function listen() {
   ignore();
-  document.body.addEventListener('keypress', showTextbox);
+  document.body.addEventListener('keypress', keypress);
   document.body.addEventListener('keydown', keydown);
   document.body.addEventListener('keyup', keyup);
   document.body.addEventListener('click', hinter.show);
 }
 
 function ignore() {
-  document.body.removeEventListener('keypress', showTextbox);
+  document.body.removeEventListener('keypress', keypress);
   document.body.removeEventListener('keydown', keydown);
   document.body.removeEventListener('keyup', keyup);
   document.body.removeEventListener('click', hinter.show);
 }
 
-function showTextbox(event) {
+function keypress(event) {
   event.key = event.key || String.fromCharCode(event.keyCode);
   if( !event.key.match(/^[A-z0-9]$/) ) { return; }
 
@@ -88,7 +57,7 @@ function showTextbox(event) {
 }
 
 function keydown(event) {
-  if( event.which == 8 ) {
+  if( event.which == 8 ) { // backspace
     event.preventDefault();
     stacker.pop();
     hinter.hide();
@@ -103,13 +72,15 @@ function keyup(event) {
   }
 }
 
-sawdust.addEventListener('keydown', function(event) {
-  if( event.which != 27 ) { return; } // ESC or shift
-
-  sawduster.hide();
-})
-
 const sawduster = {
+  listen: function() {
+    sawdust.addEventListener('keydown', function(event) {
+      if( event.which != 27 ) { return; } // ESC or shift
+
+      sawduster.hide();
+    })
+  },
+
   show: function() {
     sawdust.style.display = 'block';
     sawdust.focus();
@@ -165,6 +136,40 @@ const reader = {
     // Set foothold to currently displayed text.
     foothold.innerHTML  = stack[0] && stack[0].name || "";
   },
+
+  listen: function() {
+    input.addEventListener('keypress', function(event) {
+      if( event.which != 13 ) { return; } // ENTER
+      stacker.push(input.value);
+      event.preventDefault();
+      return false;
+    })
+
+    input.addEventListener('keydown', function(event) {
+      if( event.which != 27 ) { return; } // ESC
+      render();
+    })
+
+    input.addEventListener('change', reader.resize);
+    input.addEventListener('cut', ()     => setTimeout(reader.resize));
+    input.addEventListener('paste', ()   => setTimeout(reader.resize));
+    input.addEventListener('drop', ()    => setTimeout(reader.resize));
+    input.addEventListener('keydown', () => setTimeout(reader.resize));
+  },
+
+  resize: function() {
+    input.style.height = 'auto';
+    input.style.height = input.scrollHeight + 'px';
+    // These values are arbitrary and can and should be tweaked
+    if( input.scrollHeight > document.body.clientHeight * .75 ) {
+      const fontSize = parseInt(window.getComputedStyle(input)['font-size']) * .9;
+      input.style.fontSize = `${fontSize}px`;
+    }
+    if( input.scrollHeight < document.body.clientHeight * .5 ) {
+      const fontSize = Math.min(defaultFontSize, parseInt(window.getComputedStyle(input)['font-size']) * 1.5);
+      input.style.fontSize = `${fontSize}px`;
+    }
+  },
 }
 
 const storer = {
@@ -179,24 +184,30 @@ const storer = {
   },
 }
 
-input.addEventListener('keypress', function(event) {
-  if( event.which != 13 ) { return; } // ENTER
-  stacker.push(input.value);
-  event.preventDefault();
-  return false;
-})
+const timer = {
+  start: function() {
+    setInterval(function() {
+      if( !stack.length ) { return; }
+      let diff = (+new Date - stack[0].start)/1000;
 
-input.addEventListener('keydown', function(event) {
-  if( event.which != 27 ) { return; } // ESC
-  render();
-})
+      const hours   = Math.floor(diff / 3600);
+      const minutes = Math.floor((diff % 3600) / 60);
+      const seconds = Math.floor(diff % 60);
 
-input.addEventListener('change', resize);
-input.addEventListener('cut', ()     => setTimeout(resize));
-input.addEventListener('paste', ()   => setTimeout(resize));
-input.addEventListener('drop', ()    => setTimeout(resize));
-input.addEventListener('keydown', () => setTimeout(resize));
+      if( hours ) {
+        timeDisplay.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+      } else if( minutes ) {
+        timeDisplay.innerHTML = `${minutes}m ${seconds}s`;
+      } else {
+        timeDisplay.innerHTML = `${seconds}s`;
+      }
+    }, 1000);
+  }
+}
 
+sawduster.listen();
+reader.listen();
+timer.start();
 render();
 storer.retrieveStack(function(err, savedStack) {
   if( err ) { return console.warn(err); }
