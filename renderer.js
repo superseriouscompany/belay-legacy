@@ -89,6 +89,7 @@ const hinter = {
   },
 }
 
+let inputLength = 0;
 const reader = {
   start: function() {
     // Show and focus input.
@@ -126,6 +127,11 @@ const reader = {
   resize: function() {
     input.style.height = 'auto';
     input.style.height = input.scrollHeight + 'px';
+    // The textarea wants to be two lines when it should only be one
+    if( input.scrollHeight == 168 ) {
+      input.style.height = '84px';
+    }
+
     // These values are arbitrary and can and should be tweaked
     if( input.scrollHeight > document.body.clientHeight * .75 ) {
       const fontSize = parseInt(window.getComputedStyle(input)['font-size']) * .9;
