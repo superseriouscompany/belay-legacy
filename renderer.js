@@ -7,6 +7,7 @@ const input           = document.querySelector('.js-next');
 const timeDisplay     = document.querySelector('.js-timeDisplay');
 const foothold        = document.querySelector('.js-foothold');
 const hint            = document.querySelector('.js-hint');
+const sawdust         = document.querySelector('.js-sawdust');
 const ipc             = require('electron').ipcRenderer;
 const defaultFontSize = parseInt(window.getComputedStyle(input)['font-size']);
 
@@ -56,13 +57,15 @@ function render() {
 function listen() {
   ignore();
   document.body.addEventListener('keypress', showTextbox);
-  document.body.addEventListener('keydown', complete);
+  document.body.addEventListener('keydown', keydown);
+  document.body.addEventListener('keyup', keyup);
   document.body.addEventListener('click', hinter.show);
 }
 
 function ignore() {
   document.body.removeEventListener('keypress', showTextbox);
-  document.body.removeEventListener('keydown', complete);
+  document.body.removeEventListener('keydown', keydown);
+  document.body.removeEventListener('keyup', keyup);
   document.body.removeEventListener('click', hinter.show);
 }
 
@@ -74,13 +77,39 @@ function showTextbox(event) {
   ignore();
 }
 
-function complete(event) {
-  if( event.which != 8 ) { return; }
+function keydown(event) {
+  if( event.which == 8 ) {
+    event.preventDefault();
+    stacker.pop();
+    hinter.hide();
+    return false;
+  }
+}
 
-  event.preventDefault();
-  stacker.pop();
-  hinter.hide();
-  return false;
+function keyup(event) {
+  if( event.which == 16 ) {
+    event.preventDefault();
+    sawduster.show();
+  }
+}
+
+sawdust.addEventListener('keydown', function(event) {
+  if( event.which != 27 ) { return; } // ESC or shift
+
+  sawduster.hide();
+})
+
+const sawduster = {
+  show: function() {
+    sawdust.style.display = 'block';
+    sawdust.focus();
+    ignore();
+  },
+
+  hide: function() {
+    sawdust.style.display = 'none';
+    listen();
+  },
 }
 
 const stacker = {
