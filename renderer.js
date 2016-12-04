@@ -6,6 +6,7 @@ const now             = document.querySelector('.js-now');
 const input           = document.querySelector('.js-next');
 const timeDisplay     = document.querySelector('.js-timeDisplay');
 const foothold        = document.querySelector('.js-foothold');
+const hint            = document.querySelector('.js-hint');
 const ipc             = require('electron').ipcRenderer;
 const defaultFontSize = parseInt(window.getComputedStyle(input)['font-size']);
 
@@ -28,12 +29,11 @@ input.addEventListener('keypress', function(event) {
     event.preventDefault();
     return false;
   }
+})
 
-  if( event.which == 27 ) { // ESC
-    cancel();
-    event.preventDefault();
-    return false;
-  }
+input.addEventListener('keydown', function(event) {
+  if( event.which != 27 ) { return; } // ESC
+  cancel();
 })
 
 function resize() {
@@ -99,23 +99,41 @@ function startInput() {
 }
 
 function listen() {
-  document.body.addEventListener('keypress', function showTextbox(event) {
-    if( !event.key.match(/^[A-z0-9]$/) ) { return; }
-
-    startInput();
-    document.body.removeEventListener('keypress', showTextbox);
-    document.body.removeEventListener('keydown', complete);
-  })
-
+  document.body.addEventListener('keypress', showTextbox);
   document.body.addEventListener('keydown', complete);
+  document.body.addEventListener('click', showHint);
+}
 
-  function complete(event) {
-    if( event.which != 8 ) { return; }
+function showTextbox(event) {
+  if( !event.key.match(/^[A-z0-9]$/) ) { return; }
 
-    event.preventDefault();
-    pop();
-    return false;
+  startInput();
+  hideHint();
+  document.body.removeEventListener('keypress', showTextbox);
+  document.body.removeEventListener('keydown', complete);
+  document.body.removeEventListener('click', showHint);
+}
+
+function complete(event) {
+  if( event.which != 8 ) { return; }
+
+  event.preventDefault();
+  pop();
+  hideHint();
+  return false;
+}
+
+function showHint() {
+  hint.style.display = 'block';
+  if( stack.length ) {
+    hint.innerHTML = '(backspace to finish)'
+  } else {
+    hint.innerHTML = '(start typing)'
   }
 }
 
-push('Do one thing.');
+function hideHint() {
+  hint.style.display = 'none';
+}
+
+cancel();
