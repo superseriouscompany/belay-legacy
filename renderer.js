@@ -71,6 +71,7 @@ function ignore() {
 }
 
 function showTextbox(event) {
+  event.key = event.key || String.fromCharCode(event.keyCode);
   if( !event.key.match(/^[A-z0-9]$/) ) { return; }
 
   reader.start();
