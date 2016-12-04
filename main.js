@@ -1,13 +1,12 @@
 const electron = require('electron')
+const path     = require('path')
+const url      = require('url')
+const isDev    = require('electron-is-dev');
+
 // Module to control application life.
 const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
-
-const path = require('path')
-const url  = require('url')
-const ipc  = require('electron').ipcMain
-
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -26,7 +25,9 @@ function createWindow () {
   }))
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  if( isDev ) {
+    mainWindow.webContents.openDevTools()
+  }
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('focus');

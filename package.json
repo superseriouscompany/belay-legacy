@@ -20,6 +20,7 @@
     "electron-packager": "^8.3.0"
   },
   "dependencies": {
+    "electron-is-dev": "^0.1.2",
     "electron-json-storage": "^2.1.0"
   }
 }
