@@ -59,8 +59,10 @@ function keypress(event) {
 function keydown(event) {
   if( event.which == 8 ) { // backspace
     event.preventDefault();
-    stacker.pop();
-    hinter.hide();
+    tasker.explode(function() {
+      stacker.pop();
+      hinter.hide();
+    })
     return false;
   }
 }
@@ -70,42 +72,6 @@ function keyup(event) {
     event.preventDefault();
     sawduster.show();
   }
-}
-
-const sawduster = {
-  listen: function() {
-    sawdust.addEventListener('keydown', function(event) {
-      if( event.which != 27 ) { return; } // ESC or shift
-
-      sawduster.hide();
-    })
-  },
-
-  show: function() {
-    sawdust.style.display = 'block';
-    sawdust.focus();
-    ignore();
-  },
-
-  hide: function() {
-    sawdust.style.display = 'none';
-    listen();
-  },
-}
-
-const stacker = {
-  push: function(name) {
-    if( !name ) { console.warn("No name provided"); return render(); }
-    stack.unshift({start: +new Date, name: name, fontSize: window.getComputedStyle(input)['font-size']});
-    storer.saveStack(stack);
-    render();
-  },
-
-  pop: function() {
-    stack.shift();
-    storer.saveStack(stack);
-    render();
-  },
 }
 
 const hinter = {
@@ -172,6 +138,42 @@ const reader = {
   },
 }
 
+const sawduster = {
+  listen: function() {
+    sawdust.addEventListener('keydown', function(event) {
+      if( event.which != 27 ) { return; } // ESC or shift
+
+      sawduster.hide();
+    })
+  },
+
+  show: function() {
+    sawdust.style.display = 'block';
+    sawdust.focus();
+    ignore();
+  },
+
+  hide: function() {
+    sawdust.style.display = 'none';
+    listen();
+  },
+}
+
+const stacker = {
+  push: function(name) {
+    if( !name ) { console.warn("No name provided"); return render(); }
+    stack.unshift({start: +new Date, name: name, fontSize: window.getComputedStyle(input)['font-size']});
+    storer.saveStack(stack);
+    render();
+  },
+
+  pop: function() {
+    stack.shift();
+    storer.saveStack(stack);
+    render();
+  },
+}
+
 const storer = {
   saveStack: function(stack, cb) {
     return storage.set('stack', {stack: stack}, cb);
@@ -182,6 +184,30 @@ const storer = {
       return cb(null, payload.stack);
     })
   },
+}
+
+const tasker = {
+  explode: function(cb) {
+    const $o = $(now);
+
+    $o.html($o.text().replace(/([\S])/g, "<span>$1</span>"));
+    $o.css("position", "relative");
+    $("span", $o).each(function(i) {
+      var newTop = Math.floor(Math.random()*500)*((i%2)?1:-1);
+      var newLeft = Math.floor(Math.random()*500)*((i%2)?1:-1);
+
+      $(this).css({position: "relative",
+        opacity: 1,
+        top: 0,
+        left: 0
+      }).animate({
+        opacity: 0,
+        fontSize: 84,
+        top: newTop,
+        left:newLeft
+      },1000, cb);
+    });
+  }
 }
 
 const timer = {
@@ -205,13 +231,11 @@ const timer = {
   }
 }
 
-sawduster.listen();
 reader.listen();
+sawduster.listen();
 timer.start();
-render();
 storer.retrieveStack(function(err, savedStack) {
   if( err ) { return console.warn(err); }
-  if( !savedStack ) { return; }
-  stack = savedStack;
+  if( savedStack ) { stack = savedStack; }
   render();
 })
