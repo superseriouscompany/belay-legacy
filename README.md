@@ -2,6 +2,10 @@
 
 original README: https://github.com/electron/electron-quick-start
 
+## Requirements
+
+    $ brew install node
+
 ## Setup
 
     $ npm install
