@@ -50,6 +50,7 @@ function render() {
     foothold.innerHTML = stack[1] && stack[1].name || "";
   } else {
     now.innerHTML = 'Do one thing.'
+    timeDisplay.innerHTML = '';
   }
   listen();
 }
