@@ -23,19 +23,6 @@ setInterval(function() {
   timeDisplay.innerHTML = `${Math.floor(diff / 1000)}s`
 }, 1000);
 
-input.addEventListener('keypress', function(event) {
-  if( event.which == 13 ) { // ENTER
-    push(input.value);
-    event.preventDefault();
-    return false;
-  }
-})
-
-input.addEventListener('keydown', function(event) {
-  if( event.which != 27 ) { return; } // ESC
-  cancel();
-})
-
 function resize() {
   input.style.height = 'auto';
   input.style.height = input.scrollHeight + 'px';
@@ -48,26 +35,9 @@ function resize() {
     const fontSize = Math.min(defaultFontSize, parseInt(window.getComputedStyle(input)['font-size']) * 1.5);
     input.style.fontSize = `${fontSize}px`;
   }
-
-}
-input.addEventListener('change', resize);
-input.addEventListener('cut', ()     => setTimeout(resize));
-input.addEventListener('paste', ()   => setTimeout(resize));
-input.addEventListener('drop', ()    => setTimeout(resize));
-input.addEventListener('keydown', () => setTimeout(resize));
-
-function push(name) {
-  if( !name ) { console.warn("No name provided"); return cancel(); }
-  stack.unshift({start: +new Date, name: name, fontSize: window.getComputedStyle(input)['font-size']});
-  cancel();
 }
 
-function pop() {
-  stack.shift();
-  cancel();
-}
-
-function cancel() {
+function render() {
   input.style.display = 'none';
   input.value         = '';
   now.style.display   = 'block';
@@ -76,64 +46,102 @@ function cancel() {
     if( stack[0].fontSize ) {
       now.style.fontSize = stack[0].fontSize;
     }
-    if( stack[1] ) {
-      foothold.innerHTML  = stack[1].name;
-    }
+    foothold.innerHTML = stack[1] && stack[1].name || "";
   } else {
     now.innerHTML = 'Do one thing.'
   }
   listen();
 }
 
-function startInput() {
-  // Show and focus input.
-  input.style.display = 'block';
-  input.focus();
-
-  // Hide and clear displayed text.
-  now.style.display   = 'none';
-  now.innerHTML       = '';
-
-  // Set foothold to currently displayed text.
-  foothold.innerHTML  = stack[0] && stack[0].name || "";
-}
-
 function listen() {
+  ignore();
   document.body.addEventListener('keypress', showTextbox);
   document.body.addEventListener('keydown', complete);
-  document.body.addEventListener('click', showHint);
+  document.body.addEventListener('click', hinter.show);
+}
+
+function ignore() {
+  document.body.removeEventListener('keypress', showTextbox);
+  document.body.removeEventListener('keydown', complete);
+  document.body.removeEventListener('click', hinter.show);
 }
 
 function showTextbox(event) {
   if( !event.key.match(/^[A-z0-9]$/) ) { return; }
 
-  startInput();
-  hideHint();
-  document.body.removeEventListener('keypress', showTextbox);
-  document.body.removeEventListener('keydown', complete);
-  document.body.removeEventListener('click', showHint);
+  reader.start();
+  hinter.hide();
+  ignore();
 }
 
 function complete(event) {
   if( event.which != 8 ) { return; }
 
   event.preventDefault();
-  pop();
-  hideHint();
+  stacker.pop();
+  hinter.hide();
   return false;
 }
 
-function showHint() {
-  hint.style.display = 'block';
-  if( stack.length ) {
-    hint.innerHTML = '(backspace to finish)'
-  } else {
-    hint.innerHTML = '(start typing)'
-  }
+const stacker = {
+  push: function(name) {
+    if( !name ) { console.warn("No name provided"); return render(); }
+    stack.unshift({start: +new Date, name: name, fontSize: window.getComputedStyle(input)['font-size']});
+    render();
+  },
+
+  pop: function() {
+    stack.shift();
+    render();
+  },
 }
 
-function hideHint() {
-  hint.style.display = 'none';
+const hinter = {
+  show: function() {
+    hint.style.display = 'block';
+    if( stack.length ) {
+      hint.innerHTML = '(backspace to finish)'
+    } else {
+      hint.innerHTML = '(start typing)'
+    }
+  },
+
+  hide: function() {
+    hint.style.display = 'none';
+  },
 }
 
-cancel();
+const reader = {
+  start: function() {
+    // Show and focus input.
+    input.style.display = 'block';
+    input.focus();
+
+    // Hide and clear displayed text.
+    now.style.display   = 'none';
+    now.innerHTML       = '';
+
+    // Set foothold to currently displayed text.
+    foothold.innerHTML  = stack[0] && stack[0].name || "";
+  },
+}
+
+input.addEventListener('keypress', function(event) {
+  if( event.which != 13 ) { return; } // ENTER
+  stacker.push(input.value);
+  event.preventDefault();
+  return false;
+})
+
+input.addEventListener('keydown', function(event) {
+  if( event.which != 27 ) { return; } // ESC
+  render();
+})
+
+input.addEventListener('change', resize);
+input.addEventListener('cut', ()     => setTimeout(resize));
+input.addEventListener('paste', ()   => setTimeout(resize));
+input.addEventListener('drop', ()    => setTimeout(resize));
+input.addEventListener('keydown', () => setTimeout(resize));
+
+render();
