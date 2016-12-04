@@ -151,6 +151,10 @@ const sawduster = {
 
       sawduster.hide();
     })
+    storer.retrieveSawdust(function(err, savedSawdust) {
+      if( err ) { return console.warn(err); }
+      if( savedSawdust ) { sawdust.value = savedSawdust; }
+    })
   },
 
   show: function() {
@@ -161,7 +165,10 @@ const sawduster = {
 
   hide: function() {
     sawdust.style.display = 'none';
-    listen();
+    storer.saveSawdust(sawdust.value, function(err) {
+      if( err ) { return console.error(err); }
+      listen();
+    })
   },
 }
 
@@ -188,6 +195,15 @@ const storer = {
     return storage.get('stack', function(err, payload) {
       if( err ) { return cb(err); }
       return cb(null, payload.stack);
+    })
+  },
+  saveSawdust: function(sawdust, cb) {
+    return storage.set('sawdust', {sawdust: sawdust}, cb);
+  },
+  retrieveSawdust: function(cb) {
+    return storage.get('sawdust', function(err, payload) {
+      if( err ) { return cb(err); }
+      return cb(null, payload.sawdust);
     })
   },
 }
