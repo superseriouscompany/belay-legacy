@@ -9,17 +9,15 @@ const foothold        = document.querySelector('.js-foothold');
 const hint            = document.querySelector('.js-hint');
 const sawdust         = document.querySelector('.js-sawdust');
 const ipc             = require('electron').ipcRenderer;
+const storage         = require('electron-json-storage');
 const defaultFontSize = parseInt(window.getComputedStyle(input)['font-size']);
 
 const start  = +new Date;
 let stack    = [];
 
-window.stack = stack;
-window.input = input;
-
 setInterval(function() {
   if( !stack.length ) { return; }
-  let diff = (+new Date - stack[0].start + 350000)/1000;
+  let diff = (+new Date - stack[0].start)/1000;
 
   const hours   = Math.floor(diff / 3600);
   const minutes = Math.floor((diff % 3600) / 60);
@@ -128,11 +126,13 @@ const stacker = {
   push: function(name) {
     if( !name ) { console.warn("No name provided"); return render(); }
     stack.unshift({start: +new Date, name: name, fontSize: window.getComputedStyle(input)['font-size']});
+    storer.saveStack(stack);
     render();
   },
 
   pop: function() {
     stack.shift();
+    storer.saveStack(stack);
     render();
   },
 }
@@ -167,6 +167,18 @@ const reader = {
   },
 }
 
+const storer = {
+  saveStack: function(stack, cb) {
+    return storage.set('stack', {stack: stack}, cb);
+  },
+  retrieveStack: function(cb) {
+    return storage.get('stack', function(err, payload) {
+      if( err ) { return cb(err); }
+      return cb(null, payload.stack);
+    })
+  },
+}
+
 input.addEventListener('keypress', function(event) {
   if( event.which != 13 ) { return; } // ENTER
   stacker.push(input.value);
@@ -186,3 +198,9 @@ input.addEventListener('drop', ()    => setTimeout(resize));
 input.addEventListener('keydown', () => setTimeout(resize));
 
 render();
+storer.retrieveStack(function(err, savedStack) {
+  if( err ) { return console.warn(err); }
+  if( !savedStack ) { return; }
+  stack = savedStack;
+  render();
+})
