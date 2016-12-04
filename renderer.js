@@ -19,9 +19,19 @@ window.input = input;
 
 setInterval(function() {
   if( !stack.length ) { return; }
-  let diff = +new Date - stack[0].start;
+  let diff = (+new Date - stack[0].start + 350000)/1000;
 
-  timeDisplay.innerHTML = `${Math.floor(diff / 1000)}s`
+  const hours   = Math.floor(diff / 3600);
+  const minutes = Math.floor((diff % 3600) / 60);
+  const seconds = Math.floor(diff % 60);
+
+  if( hours ) {
+    timeDisplay.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+  } else if( minutes ) {
+    timeDisplay.innerHTML = `${minutes}m ${seconds}s`;
+  } else {
+    timeDisplay.innerHTML = `${seconds}s`;
+  }
 }, 1000);
 
 function resize() {
