@@ -158,6 +158,9 @@ const sawduster = {
   },
 
   show: function() {
+    const val = sawdust.value;
+    sawdust.value = '';
+    sawdust.value = val;
     sawdust.style.display = 'block';
     sawdust.focus();
     ignore();
@@ -165,6 +168,11 @@ const sawduster = {
 
   hide: function() {
     sawdust.style.display = 'none';
+
+    if( sawdust.value[sawdust.value.length-1] != "\n" ) {
+      sawdust.value += "\n";
+    }
+
     storer.saveSawdust(sawdust.value, function(err) {
       if( err ) { return console.error(err); }
       listen();
