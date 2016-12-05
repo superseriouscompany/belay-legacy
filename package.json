@@ -7,6 +7,11 @@
     "start": "electron .",
     "package": "electron-packager ./ Belay --platform=darwin --out ~/Desktop/Belay --version 1.0.0 --overwrite --icon=./img/icon.icns"
   },
+  "config": {
+    "ghooks": {
+      "post-commit": "npm run package"
+    }
+  },
   "repository": "https://github.com/superseriouscompany/belay",
   "keywords": [
     "focus",
@@ -17,7 +22,8 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^1.4.1",
-    "electron-packager": "^8.3.0"
+    "electron-packager": "^8.3.0",
+    "ghooks": "^1.3.2"
   },
   "dependencies": {
     "electron-is-dev": "^0.1.2",
