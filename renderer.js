@@ -8,6 +8,7 @@ const timeDisplay     = document.querySelector('.js-timeDisplay');
 const foothold        = document.querySelector('.js-foothold');
 const hint            = document.querySelector('.js-hint');
 const sawdust         = document.querySelector('.js-sawdust');
+const map             = document.querySelector('.js-map');
 const ipc             = require('electron').ipcRenderer;
 const storage         = require('electron-json-storage');
 const defaultFontSize = parseInt(window.getComputedStyle(input)['font-size']);
@@ -68,9 +69,13 @@ function keydown(event) {
 }
 
 function keyup(event) {
-  if( event.which == 16 ) {
+  if( event.which == 16 ) { // shift
     event.preventDefault();
-    sawduster.show();
+    if( event.location === KeyboardEvent.DOM_KEY_LOCATION_RIGHT ) {
+      mapper.show();
+    } else {
+      sawduster.show();
+    }
   }
 }
 
@@ -87,6 +92,25 @@ const hinter = {
   hide: function() {
     hint.style.display = 'none';
   },
+}
+
+const mapper = {
+  listen: function() {
+    document.body.addEventListener('keydown', function(event) {
+      if( event.which != 27 ) { return; } // ESC
+      if( map.style.display != 'block' ) { return; }
+      mapper.hide();
+    })
+  },
+
+  show: function() {
+    map.style.display = 'block';
+    map.innerHTML = JSON.stringify(stack);
+  },
+
+  hide: function() {
+    map.style.display = 'none';
+  }
 }
 
 let inputLength = 0;
@@ -147,7 +171,7 @@ const reader = {
 const sawduster = {
   listen: function() {
     document.body.addEventListener('keydown', function(event) {
-      if( event.which != 27 ) { return; } // ESC or shift
+      if( event.which != 27 ) { return; } // ESC
       if( sawdust.style.display != 'block' ) { return; }
       sawduster.hide();
     })
@@ -259,6 +283,7 @@ const timer = {
 
 reader.listen();
 sawduster.listen();
+mapper.listen();
 timer.start();
 storer.retrieveStack(function(err, savedStack) {
   if( err ) { return console.warn(err); }
