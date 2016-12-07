@@ -146,9 +146,9 @@ const reader = {
 
 const sawduster = {
   listen: function() {
-    sawdust.addEventListener('keydown', function(event) {
+    document.body.addEventListener('keydown', function(event) {
       if( event.which != 27 ) { return; } // ESC or shift
-
+      if( sawdust.style.display != 'block' ) { return; }
       sawduster.hide();
     })
     storer.retrieveSawdust(function(err, savedSawdust) {
@@ -169,7 +169,8 @@ const sawduster = {
   hide: function() {
     sawdust.style.display = 'none';
 
-    if( sawdust.value[sawdust.value.length-1] != "\n" ) {
+    sawdust.value = sawdust.value.trim();
+    if( sawdust.value && sawdust.value[sawdust.value.length-1] != "\n" ) {
       sawdust.value += "\n";
     }
 
