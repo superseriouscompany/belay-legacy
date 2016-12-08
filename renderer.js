@@ -11,12 +11,46 @@ const sawdust         = document.querySelector('.js-sawdust');
 const map             = document.querySelector('.js-map');
 const ipc             = require('electron').ipcRenderer;
 const storage         = require('electron-json-storage');
+const redux           = require('redux');
 const defaultFontSize = parseInt(window.getComputedStyle(input)['font-size']);
+
+function lawng(state, action) {
+  console.debug(state, action);
+  state = state || [];
+  switch (action.type) {
+    case 'push':
+      if( !action.task ) { console.warn("No task provided to push", action); return state;}
+      state.unshift(action.task);
+      return state;
+    case 'pop':
+      state.shift();
+      return state;
+    case 'loadStack':
+      state = action.stack;
+      return state;
+    case '@@redux/INIT':
+      return state;
+    default:
+      console.warn("Unknown action type", action.type);
+      return state;
+  }
+}
+
+const store = redux.createStore(lawng);
 
 const start  = +new Date;
 let stack    = [];
 
-function render() {
+store.subscribe(function(nice) {
+  console.log(nice);
+})
+store.subscribe(render)
+
+function render(state) {
+  state = state || store.getState();
+  console.log("render called with", state);
+
+  // glue code for old calls
   input.style.display = 'none';
   input.value         = '';
   now.style.display   = 'block';
@@ -153,7 +187,7 @@ const reader = {
 
     input.addEventListener('keydown', function(event) {
       if( event.which != 27 ) { return; } // ESC
-      render();
+      render(stack);
     })
 
     input.addEventListener('change', reader.resize);
@@ -221,16 +255,16 @@ const sawduster = {
 
 const stacker = {
   push: function(name) {
-    if( !name ) { console.warn("No name provided"); return render(); }
+    if( !name ) { return console.warn("No name provided"); }
+    store.dispatch({type: 'push', task: name});
     stack.unshift({start: +new Date, name: name, fontSize: window.getComputedStyle(input)['font-size']});
     storer.saveStack(stack);
-    render();
   },
 
   pop: function() {
+    store.dispatch({type: 'pop'});
     stack.shift();
     storer.saveStack(stack);
-    render();
   },
 
   abort: function() {
@@ -310,6 +344,7 @@ mapper.listen();
 timer.start();
 storer.retrieveStack(function(err, savedStack) {
   if( err ) { return console.warn(err); }
-  if( savedStack ) { stack = savedStack; }
-  render();
+  if( !savedStack ) { return; }
+  console.log("dispatching saved stack");
+  store.dispatch({type: 'loadStack', stack: savedStack});
 })
