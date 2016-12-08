@@ -65,12 +65,17 @@ function keydown(event) {
       hinter.hide();
     })
     return false;
+  } else if( event.which == 27 ) {
+    event.preventDefault();
+    stacker.abort();
+    hinter.hide();
   }
 }
 
 function keyup(event) {
   if( event.which == 16 ) { // shift
     event.preventDefault();
+    ignore();
     if( event.location === KeyboardEvent.DOM_KEY_LOCATION_RIGHT ) {
       mapper.show();
     } else {
@@ -83,7 +88,7 @@ const hinter = {
   show: function() {
     hint.style.display = 'block';
     if( stack.length ) {
-      hint.innerHTML = '(backspace to finish)'
+      hint.innerHTML = '(backspace to finish, escape to bail)'
     } else {
       hint.innerHTML = '(start typing)'
     }
@@ -100,6 +105,7 @@ const mapper = {
       if( event.which != 27 ) { return; } // ESC
       if( map.style.display != 'block' ) { return; }
       mapper.hide();
+      listen();
     })
   },
 
@@ -196,7 +202,6 @@ const sawduster = {
     sawdust.value = val;
     sawdust.style.display = 'block';
     sawdust.focus();
-    ignore();
   },
 
   hide: function() {
@@ -227,6 +232,11 @@ const stacker = {
     storer.saveStack(stack);
     render();
   },
+
+  abort: function() {
+    // eventually this will save records of bailure in the data model
+    stacker.pop();
+  }
 }
 
 const storer = {
