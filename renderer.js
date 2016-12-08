@@ -11,44 +11,19 @@ const sawdust         = document.querySelector('.js-sawdust');
 const map             = document.querySelector('.js-map');
 const ipc             = require('electron').ipcRenderer;
 const storage         = require('electron-json-storage');
-const redux           = require('redux');
+const store           = require('./js/store');
 const defaultFontSize = parseInt(window.getComputedStyle(input)['font-size']);
-
-function lawng(state, action) {
-  console.debug(state, action);
-  state = state || [];
-  switch (action.type) {
-    case 'push':
-      if( !action.task ) { console.warn("No task provided to push", action); return state;}
-      state.unshift(action.task);
-      return state;
-    case 'pop':
-      state.shift();
-      return state;
-    case 'loadStack':
-      state = action.stack;
-      return state;
-    case '@@redux/INIT':
-      return state;
-    default:
-      console.warn("Unknown action type", action.type);
-      return state;
-  }
-}
-
-const store = redux.createStore(lawng);
 
 const start  = +new Date;
 let stack    = [];
 
 store.subscribe(function(nice) {
-  console.log(nice);
+  console.debug('State is now', store.getState());
 })
 store.subscribe(render)
 
-function render(state) {
-  state = state || store.getState();
-  console.log("render called with", state);
+function render() {
+  const stack = store.getState();
 
   // glue code for old calls
   input.style.display = 'none';
@@ -345,6 +320,5 @@ timer.start();
 storer.retrieveStack(function(err, savedStack) {
   if( err ) { return console.warn(err); }
   if( !savedStack ) { return; }
-  console.log("dispatching saved stack");
   store.dispatch({type: 'loadStack', stack: savedStack});
 })
