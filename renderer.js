@@ -8,6 +8,7 @@ const timeDisplay     = document.querySelector('.js-timeDisplay');
 const foothold        = document.querySelector('.js-foothold');
 const hint            = document.querySelector('.js-hint');
 const sawdust         = document.querySelector('.js-sawdust');
+const map             = document.querySelector('.js-map');
 const ipc             = require('electron').ipcRenderer;
 const storage         = require('electron-json-storage');
 const defaultFontSize = parseInt(window.getComputedStyle(input)['font-size']);
@@ -68,9 +69,13 @@ function keydown(event) {
 }
 
 function keyup(event) {
-  if( event.which == 16 ) {
+  if( event.which == 16 ) { // shift
     event.preventDefault();
-    sawduster.show();
+    if( event.location === KeyboardEvent.DOM_KEY_LOCATION_RIGHT ) {
+      mapper.show();
+    } else {
+      sawduster.show();
+    }
   }
 }
 
@@ -86,6 +91,34 @@ const hinter = {
 
   hide: function() {
     hint.style.display = 'none';
+  },
+}
+
+const mapper = {
+  listen: function() {
+    document.body.addEventListener('keydown', function(event) {
+      if( event.which != 27 ) { return; } // ESC
+      if( map.style.display != 'block' ) { return; }
+      mapper.hide();
+    })
+  },
+
+  show: function() {
+    map.style.display = 'block';
+    map.innerHTML = mapper.renderStack(stack);
+  },
+
+  hide: function() {
+    map.style.display = 'none';
+  },
+
+  renderStack: function(stack) {
+    return [].concat(stack).reverse().map(function(t, i) {
+      let indentation = '';
+      for( var j = 0; j < i; j++ ) { indentation += "--"}
+
+      return `${indentation}${t.name} ${timer.renderTime(t.start).split(' ')[0]}`
+    }).join("<br />");
   },
 }
 
@@ -147,7 +180,7 @@ const reader = {
 const sawduster = {
   listen: function() {
     document.body.addEventListener('keydown', function(event) {
-      if( event.which != 27 ) { return; } // ESC or shift
+      if( event.which != 27 ) { return; } // ESC
       if( sawdust.style.display != 'block' ) { return; }
       sawduster.hide();
     })
@@ -240,25 +273,30 @@ const timer = {
   start: function() {
     setInterval(function() {
       if( !stack.length ) { return; }
-      let diff = (+new Date - stack[0].start)/1000;
-
-      const hours   = Math.floor(diff / 3600);
-      const minutes = Math.floor((diff % 3600) / 60);
-      const seconds = Math.floor(diff % 60);
-
-      if( hours ) {
-        timeDisplay.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
-      } else if( minutes ) {
-        timeDisplay.innerHTML = `${minutes}m ${seconds}s`;
-      } else {
-        timeDisplay.innerHTML = `${seconds}s`;
-      }
+      timeDisplay.innerHTML = timer.renderTime(stack[0].start);
     }, 1000);
+  },
+
+  renderTime: function(since) {
+    let diff = (+new Date - since)/1000;
+
+    const hours   = Math.floor(diff / 3600);
+    const minutes = Math.floor((diff % 3600) / 60);
+    const seconds = Math.floor(diff % 60);
+
+    if( hours ) {
+      return `${hours}h ${minutes}m ${seconds}s`;
+    }
+    if( minutes ) {
+      return `${minutes}m ${seconds}s`;
+    }
+    return `${seconds}s`;
   }
 }
 
 reader.listen();
 sawduster.listen();
+mapper.listen();
 timer.start();
 storer.retrieveStack(function(err, savedStack) {
   if( err ) { return console.warn(err); }
