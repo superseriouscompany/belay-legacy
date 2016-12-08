@@ -105,12 +105,21 @@ const mapper = {
 
   show: function() {
     map.style.display = 'block';
-    map.innerHTML = JSON.stringify(stack);
+    map.innerHTML = mapper.renderStack(stack);
   },
 
   hide: function() {
     map.style.display = 'none';
-  }
+  },
+
+  renderStack: function(stack) {
+    return [].concat(stack).reverse().map(function(t, i) {
+      let indentation = '';
+      for( var j = 0; j < i; j++ ) { indentation += "--"}
+
+      return `${indentation}${t.name} ${timer.renderTime(t.start).split(' ')[0]}`
+    }).join("<br />");
+  },
 }
 
 let inputLength = 0;
@@ -264,20 +273,24 @@ const timer = {
   start: function() {
     setInterval(function() {
       if( !stack.length ) { return; }
-      let diff = (+new Date - stack[0].start)/1000;
-
-      const hours   = Math.floor(diff / 3600);
-      const minutes = Math.floor((diff % 3600) / 60);
-      const seconds = Math.floor(diff % 60);
-
-      if( hours ) {
-        timeDisplay.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
-      } else if( minutes ) {
-        timeDisplay.innerHTML = `${minutes}m ${seconds}s`;
-      } else {
-        timeDisplay.innerHTML = `${seconds}s`;
-      }
+      timeDisplay.innerHTML = timer.renderTime(stack[0].start);
     }, 1000);
+  },
+
+  renderTime: function(since) {
+    let diff = (+new Date - since)/1000;
+
+    const hours   = Math.floor(diff / 3600);
+    const minutes = Math.floor((diff % 3600) / 60);
+    const seconds = Math.floor(diff % 60);
+
+    if( hours ) {
+      return `${hours}h ${minutes}m ${seconds}s`;
+    }
+    if( minutes ) {
+      return `${minutes}m ${seconds}s`;
+    }
+    return `${seconds}s`;
   }
 }
 
