@@ -2,7 +2,6 @@
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
 //
-const now             = document.querySelector('.js-now');
 const input           = document.querySelector('.js-next');
 const timeDisplay     = document.querySelector('.js-timeDisplay');
 const foothold        = document.querySelector('.js-foothold');
@@ -28,17 +27,7 @@ function render() {
   // glue code for old calls
   input.style.display = 'none';
   input.value         = '';
-  now.style.display   = 'block';
-  if( stack.length ) {
-    now.innerHTML = stack[0].name;
-    if( stack[0].fontSize ) {
-      now.style.fontSize = stack[0].fontSize;
-    }
-    foothold.innerHTML = stack[1] && stack[1].name || "";
-  } else {
-    now.innerHTML = 'Do one thing.'
-    timeDisplay.innerHTML = '';
-  }
+  if( !stack.length ) { timeDisplay.innerHTML = ''; }
   listen();
 }
 
