@@ -9,7 +9,13 @@ module.exports = function(s) {
 }
 
 function render() {
-  const stack = store.getState();
+  const state = store.getState();
+  const stack = state.stack;
+
+  if( state.focus == 'reader' ) {
+    return $now.style.display = 'none';
+  }
+
   $now.style.display   = 'block';
   if( stack.length ) {
     $now.innerHTML = stack[0].name;

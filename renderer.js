@@ -13,9 +13,6 @@ const storage         = require('electron-json-storage');
 const store           = require('./js/store');
 const defaultFontSize = parseInt(window.getComputedStyle(input)['font-size']);
 
-// legacy
-const now = document.querySelector('.js-now');
-
 const start  = +new Date;
 let stack    = [];
 
@@ -133,13 +130,11 @@ const mapper = {
 let inputLength = 0;
 const reader = {
   start: function() {
+    store.dispatch({type: 'focus', place: 'reader'});
+
     // Show and focus input.
     input.style.display = 'block';
     input.focus();
-
-    // Hide and clear displayed text.
-    now.style.display   = 'none';
-    now.innerHTML       = '';
 
     // Set foothold to currently displayed text.
     foothold.innerHTML  = stack[0] && stack[0].name || "";
