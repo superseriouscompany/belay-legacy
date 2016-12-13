@@ -5,7 +5,7 @@ body { font-family: Helvetica; color: #333; }
 .timeDisplay { position: absolute; bottom: 1em; right: 1em; color: gainsboro; font-family: Helvetica; }
 .foothold { position: absolute; top: 1em; width: 100%; text-align: center; color: gainsboro; }
 
-.mainFocus { font-family: 'Permanent Marker', cursive; font-size: 96px; letter-spacing: 13px; line-height: .88em; width: 100%; word-wrap: break-word; }
+.mainFocus { font-family: 'Permanent Marker', 'Comic Sans MS', cursive; font-size: 96px; letter-spacing: 13px; line-height: .88em; width: 100%; word-wrap: break-word; }
 .now span { position: relative; top: 0; left: 0; opacity: 1; transition: opacity 1s, top 1s, left 1s; transition-timing-function: cubic-bezier(0, 0.45, 0.81, 1);}
 .next { border: 0; text-align: center; height: auto; display: none; padding: 0; margin: 0; width: 100%; outline: none; min-height: 84px; height: 84px; max-height: 100%; color: mediumpurple; }
 .hint { margin-top: 1em; color: gainsboro; display: none; }

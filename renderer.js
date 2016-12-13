@@ -224,8 +224,9 @@ const sawduster = {
 const stacker = {
   push: function(name) {
     if( !name ) { return console.warn("No name provided"); }
-    store.dispatch({type: 'push', task: name});
-    stack.unshift({start: +new Date, name: name, fontSize: window.getComputedStyle(input)['font-size']});
+    const task = {start: +new Date, name: name, fontSize: window.getComputedStyle(input)['font-size']}
+    store.dispatch({type: 'push', task: task});
+    stack.unshift(task);
     storer.saveStack(stack);
   },
 
