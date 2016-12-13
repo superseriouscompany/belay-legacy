@@ -13,6 +13,9 @@ const storage         = require('electron-json-storage');
 const store           = require('./js/store');
 const defaultFontSize = parseInt(window.getComputedStyle(input)['font-size']);
 
+// legacy
+const now = document.querySelector('.js-now');
+
 const start  = +new Date;
 let stack    = [];
 
@@ -20,6 +23,7 @@ store.subscribe(function(nice) {
   console.debug('State is now', store.getState());
 })
 store.subscribe(render)
+require('./components/hopper')(store);
 
 function render() {
   const stack = store.getState();
