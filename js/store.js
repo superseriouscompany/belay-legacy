@@ -7,7 +7,6 @@ function stacker(state, action) {
     case 'push':
       if( !action.task ) { console.warn("No task provided to push", action); return state;}
       state.stack.unshift(action.task);
-      state.focus = 'hopper';
       return state;
     case 'pop':
       state.stack.shift();
@@ -15,8 +14,11 @@ function stacker(state, action) {
     case 'loadStack':
       state.stack = action.stack;
       return state;
-    case 'focus':
-      state.focus = action.place;
+    case 'startReading':
+      state.reading = true;
+      return state;
+    case 'stopReading':
+      state.reading = false;
       return state;
     case '@@redux/INIT':
       return state;

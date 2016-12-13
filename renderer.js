@@ -131,7 +131,7 @@ const mapper = {
 let inputLength = 0;
 const reader = {
   start: function() {
-    store.dispatch({type: 'focus', place: 'reader'});
+    store.dispatch({type: 'startReading'});
 
     // Show and focus input.
     input.style.display = 'block';
@@ -221,6 +221,7 @@ const stacker = {
   push: function(name) {
     if( !name ) { return console.warn("No name provided"); }
     const task = {start: +new Date, name: name, fontSize: window.getComputedStyle(input)['font-size']}
+    store.dispatch({type: 'stopReading'});
     store.dispatch({type: 'push', task: task});
     stack.unshift(task);
     storer.saveStack(stack);

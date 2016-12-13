@@ -31,7 +31,7 @@ function render() {
   const state = store.getState();
   const stack = state.stack;
 
-  if( state.focus == 'reader' ) {
+  if( state.reading ) {
     return $now.style.display = 'none';
   }
 
