@@ -20,7 +20,7 @@ store.subscribe(function(nice) {
   console.debug('State is now', store.getState());
 })
 store.subscribe(render)
-require('./components/hopper')(store);
+const hopper = require('./components/hopper')(store);
 
 function render() {
   const stack = store.getState();
@@ -59,7 +59,8 @@ function keypress(event) {
 function keydown(event) {
   if( event.which == 8 ) { // backspace
     event.preventDefault();
-    tasker.explode(function() {
+
+    hopper.explode(function() {
       stacker.pop();
       hinter.hide();
     })
@@ -256,25 +257,6 @@ const storer = {
       return cb(null, payload.sawdust);
     })
   },
-}
-
-const tasker = {
-  explode: function(cb) {
-    now.innerHTML = now.innerText.replace(/([\S])/g, "<span>$1</span>")
-    const spans = now.querySelectorAll('span');
-    for( var i = 0; i < spans.length; i++ ) {
-      const s = spans[i];
-      window.getComputedStyle(s).opacity; // https://timtaubert.de/blog/2012/09/css-transitions-for-dynamically-created-dom-elements/
-      var newTop = Math.floor(Math.random()*500)*((i%2)?1:-1);
-      var newLeft = Math.floor(Math.random()*500)*((i%2)?1:-1);
-      s.style.position = 'relative';
-      s.style.opacity = 0;
-      s.style.top = `${newTop}px`;
-      s.style.left = `${newLeft}px`;
-    }
-
-    setTimeout(cb, 1000);
-  }
 }
 
 const timer = {
