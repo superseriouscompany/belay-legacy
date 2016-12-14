@@ -2,7 +2,6 @@
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
 //
-const timeDisplay     = document.querySelector('.js-timeDisplay');
 const input           = document.querySelector('.js-next');
 const sawdust         = document.querySelector('.js-sawdust');
 const ipc             = require('electron').ipcRenderer;
@@ -27,7 +26,6 @@ function render() {
   // glue code for old calls
   input.style.display = 'none';
   input.value         = '';
-  if( !stack.length ) { timeDisplay.innerHTML = ''; }
   listen();
 }
 
@@ -208,34 +206,8 @@ const storer = {
   },
 }
 
-const timer = {
-  start: function() {
-    setInterval(function() {
-      if( !stack.length ) { return; }
-      timeDisplay.innerHTML = timer.renderTime(stack[0].start);
-    }, 1000);
-  },
-
-  renderTime: function(since) {
-    let diff = (+new Date - since)/1000;
-
-    const hours   = Math.floor(diff / 3600);
-    const minutes = Math.floor((diff % 3600) / 60);
-    const seconds = Math.floor(diff % 60);
-
-    if( hours ) {
-      return `${hours}h ${minutes}m ${seconds}s`;
-    }
-    if( minutes ) {
-      return `${minutes}m ${seconds}s`;
-    }
-    return `${seconds}s`;
-  }
-}
-
 reader.listen();
 sawduster.listen();
-timer.start();
 storer.retrieveStack(function(err, savedStack) {
   if( err ) { return console.warn(err); }
   if( !savedStack ) { return; }
