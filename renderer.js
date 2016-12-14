@@ -22,10 +22,6 @@ store.subscribe(render)
 const hopper = require('./components/hopper')(store);
 const map    = require('./components/map')(store);
 
-// legacy
-const $map             = document.querySelector('.js-map');
-
-
 function render() {
   const stack = store.getState();
 
@@ -73,6 +69,7 @@ function keydown(event) {
     event.preventDefault();
     stacker.abort();
     hinter.hide();
+    store.dispatch({type: 'hideMap'});
   }
 }
 
@@ -100,17 +97,6 @@ const hinter = {
 
   hide: function() {
     hint.style.display = 'none';
-  },
-}
-
-const mapper = {
-  listen: function() {
-    document.body.addEventListener('keydown', function(event) {
-      if( event.which != 27 ) { return; } // ESC
-      if( $map.style.display != 'block' ) { return; }
-      store.dispatch({type: 'hideMap'});
-      listen();
-    })
   },
 }
 
@@ -273,7 +259,6 @@ const timer = {
 
 reader.listen();
 sawduster.listen();
-mapper.listen();
 timer.start();
 storer.retrieveStack(function(err, savedStack) {
   if( err ) { return console.warn(err); }
