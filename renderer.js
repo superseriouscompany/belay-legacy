@@ -3,7 +3,6 @@
 // All of the Node.js APIs are available in this process.
 //
 const timeDisplay     = document.querySelector('.js-timeDisplay');
-const foothold        = document.querySelector('.js-foothold');
 const input           = document.querySelector('.js-next');
 const sawdust         = document.querySelector('.js-sawdust');
 const ipc             = require('electron').ipcRenderer;
@@ -18,8 +17,9 @@ store.subscribe(function(nice) {
   console.debug('State is now', store.getState());
 })
 store.subscribe(render)
-const hopper = require('./components/hopper')(store);
-const map    = require('./components/map')(store);
+const hopper   = require('./components/hopper')(store);
+const map      = require('./components/map')(store);
+const foothold = require('./components/foothold')(store);
 
 function render() {
   const stack = store.getState();
@@ -87,9 +87,6 @@ const reader = {
     // Show and focus input.
     input.style.display = 'block';
     input.focus();
-
-    // Set foothold to currently displayed text.
-    foothold.innerHTML  = stack[0] && stack[0].name || "";
   },
 
   listen: function() {
