@@ -58,10 +58,7 @@ function keydown(event) {
     stacker.abort();
     store.dispatch({type: 'hideMap'});
     store.dispatch({type: 'hideSawdust'});
-    storer.saveSawdust($sawdust.value, function(err) {
-      if( err ) { return console.error(err); }
-      listen();
-    })
+    listen();
   }
 }
 
@@ -103,8 +100,4 @@ storer.retrieveStack(function(err, savedStack) {
   if( err ) { return console.warn(err); }
   if( !savedStack ) { return; }
   store.dispatch({type: 'loadStack', stack: savedStack});
-})
-storer.retrieveSawdust(function(err, savedSawdust) {
-  if( err ) { return console.warn(err); }
-  if( savedSawdust ) { $sawdust.value = savedSawdust; }
 })
