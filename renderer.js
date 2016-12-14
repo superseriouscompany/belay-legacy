@@ -4,7 +4,6 @@
 //
 const ipc      = require('electron').ipcRenderer;
 const store    = require('./js/store');
-const storer   = require('./js/storer');
 
 const hopper   = require('./components/hopper')(store);
 const map      = require('./components/map')(store);
@@ -74,12 +73,6 @@ function shift(event) {
 }
 
 document.body.addEventListener('keydown', escape);
-storer.retrieveStack(function(err, savedStack) {
-  if( err ) { return console.warn(err); }
-  if( !savedStack ) { return; }
-  store.dispatch({type: 'loadStack', stack: savedStack});
-})
-
 store.subscribe(function() {
   console.debug('State is now', store.getState());
   const state = store.getState();

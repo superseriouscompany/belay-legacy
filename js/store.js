@@ -36,6 +36,11 @@ function stacker(state, action) {
       state.sawdust = false;
       return state;
     case '@@redux/INIT':
+      storer.retrieveStack(function(err, savedStack) {
+        if( err ) { return console.warn(err); }
+        if( !savedStack ) { return; }
+        module.exports.dispatch({type: 'loadStack', stack: savedStack});
+      })
       return state;
     default:
       console.warn("Unknown action type", action.type);
