@@ -10,8 +10,15 @@ let stack    = [];
 
 const $sawdust         = document.querySelector('.js-sawdust');
 
-store.subscribe(function(nice) {
+store.subscribe(function() {
   console.debug('State is now', store.getState());
+  const state = store.getState();
+
+  if( state.reading || state.map || state.sawdust ) {
+    ignore();
+  } else {
+    listen();
+  }
 })
 const hopper   = require('./components/hopper')(store);
 const map      = require('./components/map')(store);
@@ -46,6 +53,7 @@ function keydown(event) {
 
     hopper.explode(function() {
       stacker.pop();
+      listen();
     })
     return false;
   }
