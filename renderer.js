@@ -65,6 +65,8 @@ function keydown(event) {
     event.preventDefault();
     stacker.abort();
     store.dispatch({type: 'hideMap'});
+    store.dispatch({type: 'hideSawdust'});
+    sawduster.hide();
   }
 }
 
@@ -131,19 +133,6 @@ const reader = {
 }
 
 const sawduster = {
-  listen: function() {
-    document.body.addEventListener('keydown', function(event) {
-      if( event.which != 27 ) { return; } // ESC
-      if( $sawdust.style.display != 'block' ) { return; }
-      store.dispatch({type: 'hideSawdust'});
-      sawduster.hide();
-    })
-    storer.retrieveSawdust(function(err, savedSawdust) {
-      if( err ) { return console.warn(err); }
-      if( savedSawdust ) { $sawdust.value = savedSawdust; }
-    })
-  },
-
   hide: function() {
     $sawdust.value = $sawdust.value.trim();
     if( $sawdust.value && $sawdust.value[$sawdust.value.length-1] != "\n" ) {
@@ -201,9 +190,12 @@ const storer = {
 }
 
 reader.listen();
-sawduster.listen();
 storer.retrieveStack(function(err, savedStack) {
   if( err ) { return console.warn(err); }
   if( !savedStack ) { return; }
   store.dispatch({type: 'loadStack', stack: savedStack});
+})
+storer.retrieveSawdust(function(err, savedSawdust) {
+  if( err ) { return console.warn(err); }
+  if( savedSawdust ) { $sawdust.value = savedSawdust; }
 })
