@@ -13,16 +13,11 @@ const $sawdust         = document.querySelector('.js-sawdust');
 store.subscribe(function(nice) {
   console.debug('State is now', store.getState());
 })
-store.subscribe(render)
 const hopper   = require('./components/hopper')(store);
 const map      = require('./components/map')(store);
 const foothold = require('./components/foothold')(store);
 const sawdust  = require('./components/sawdust')(store);
 const reader   = require('./components/reader')(store);
-
-function render() {
-  listen();
-}
 
 function listen() {
   ignore();
@@ -53,13 +48,16 @@ function keydown(event) {
       stacker.pop();
     })
     return false;
-  } else if( event.which == 27 ) {
-    event.preventDefault();
-    stacker.abort();
-    store.dispatch({type: 'hideMap'});
-    store.dispatch({type: 'hideSawdust'});
-    listen();
   }
+}
+
+function escape(event) {
+  if( event.which != 27 ) { return; }
+  event.preventDefault();
+  stacker.abort();
+  store.dispatch({type: 'hideMap'});
+  store.dispatch({type: 'hideSawdust'});
+  listen();
 }
 
 function keyup(event) {
@@ -96,6 +94,8 @@ const stacker = {
   }
 }
 
+listen();
+document.body.addEventListener('keydown', escape);
 storer.retrieveStack(function(err, savedStack) {
   if( err ) { return console.warn(err); }
   if( !savedStack ) { return; }
