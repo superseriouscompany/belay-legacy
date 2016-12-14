@@ -7,7 +7,6 @@ const timeDisplay     = document.querySelector('.js-timeDisplay');
 const foothold        = document.querySelector('.js-foothold');
 const hint            = document.querySelector('.js-hint');
 const sawdust         = document.querySelector('.js-sawdust');
-const map             = document.querySelector('.js-map');
 const ipc             = require('electron').ipcRenderer;
 const storage         = require('electron-json-storage');
 const store           = require('./js/store');
@@ -21,6 +20,11 @@ store.subscribe(function(nice) {
 })
 store.subscribe(render)
 const hopper = require('./components/hopper')(store);
+const map    = require('./components/map')(store);
+
+// legacy
+const $map             = document.querySelector('.js-map');
+
 
 function render() {
   const stack = store.getState();
@@ -77,7 +81,7 @@ function keyup(event) {
     event.preventDefault();
     ignore();
     if( event.location === KeyboardEvent.DOM_KEY_LOCATION_RIGHT ) {
-      mapper.show();
+      store.dispatch({type: 'showMap'});
     } else {
       sawduster.show();
     }
@@ -103,28 +107,10 @@ const mapper = {
   listen: function() {
     document.body.addEventListener('keydown', function(event) {
       if( event.which != 27 ) { return; } // ESC
-      if( map.style.display != 'block' ) { return; }
-      mapper.hide();
+      if( $map.style.display != 'block' ) { return; }
+      store.dispatch({type: 'hideMap'});
       listen();
     })
-  },
-
-  show: function() {
-    map.style.display = 'block';
-    map.innerHTML = mapper.renderStack(stack);
-  },
-
-  hide: function() {
-    map.style.display = 'none';
-  },
-
-  renderStack: function(stack) {
-    return [].concat(stack).reverse().map(function(t, i) {
-      let indentation = '';
-      for( var j = 0; j < i; j++ ) { indentation += "--"}
-
-      return `${indentation}${t.name} ${timer.renderTime(t.start).split(' ')[0]}`
-    }).join("<br />");
   },
 }
 

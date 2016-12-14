@@ -20,6 +20,12 @@ function stacker(state, action) {
     case 'stopReading':
       state.reading = false;
       return state;
+    case 'showMap':
+      state.map = true;
+      return state;
+    case 'hideMap':
+      state.map = false;
+      return state;
     case '@@redux/INIT':
       return state;
     default:
