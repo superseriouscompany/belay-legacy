@@ -3,7 +3,6 @@
 // All of the Node.js APIs are available in this process.
 //
 const input           = document.querySelector('.js-next');
-const sawdust         = document.querySelector('.js-sawdust');
 const ipc             = require('electron').ipcRenderer;
 const storage         = require('electron-json-storage');
 const store           = require('./js/store');
@@ -12,6 +11,9 @@ const defaultFontSize = parseInt(window.getComputedStyle(input)['font-size']);
 const start  = +new Date;
 let stack    = [];
 
+const $sawdust         = document.querySelector('.js-sawdust');
+
+
 store.subscribe(function(nice) {
   console.debug('State is now', store.getState());
 })
@@ -19,6 +21,7 @@ store.subscribe(render)
 const hopper   = require('./components/hopper')(store);
 const map      = require('./components/map')(store);
 const foothold = require('./components/foothold')(store);
+const sawdust  = require('./components/sawdust')(store);
 
 function render() {
   const stack = store.getState();
@@ -72,7 +75,7 @@ function keyup(event) {
     if( event.location === KeyboardEvent.DOM_KEY_LOCATION_RIGHT ) {
       store.dispatch({type: 'showMap'});
     } else {
-      sawduster.show();
+      store.dispatch({type: 'showSawdust'});
     }
   }
 }
@@ -131,32 +134,23 @@ const sawduster = {
   listen: function() {
     document.body.addEventListener('keydown', function(event) {
       if( event.which != 27 ) { return; } // ESC
-      if( sawdust.style.display != 'block' ) { return; }
+      if( $sawdust.style.display != 'block' ) { return; }
+      store.dispatch({type: 'hideSawdust'});
       sawduster.hide();
     })
     storer.retrieveSawdust(function(err, savedSawdust) {
       if( err ) { return console.warn(err); }
-      if( savedSawdust ) { sawdust.value = savedSawdust; }
+      if( savedSawdust ) { $sawdust.value = savedSawdust; }
     })
   },
 
-  show: function() {
-    const val = sawdust.value;
-    sawdust.value = '';
-    sawdust.value = val;
-    sawdust.style.display = 'block';
-    sawdust.focus();
-  },
-
   hide: function() {
-    sawdust.style.display = 'none';
-
-    sawdust.value = sawdust.value.trim();
-    if( sawdust.value && sawdust.value[sawdust.value.length-1] != "\n" ) {
-      sawdust.value += "\n";
+    $sawdust.value = $sawdust.value.trim();
+    if( $sawdust.value && $sawdust.value[$sawdust.value.length-1] != "\n" ) {
+      $sawdust.value += "\n";
     }
 
-    storer.saveSawdust(sawdust.value, function(err) {
+    storer.saveSawdust($sawdust.value, function(err) {
       if( err ) { return console.error(err); }
       listen();
     })

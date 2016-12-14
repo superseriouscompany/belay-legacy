@@ -26,6 +26,12 @@ function stacker(state, action) {
     case 'hideMap':
       state.map = false;
       return state;
+    case 'showSawdust':
+      state.sawdust = true;
+      return state;
+    case 'hideSawdust':
+      state.sawdust = false;
+      return state;
     case '@@redux/INIT':
       return state;
     default:
