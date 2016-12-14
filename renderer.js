@@ -2,24 +2,10 @@
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
 //
-const ipc             = require('electron').ipcRenderer;
-const store           = require('./js/store');
-const storer          = require('./js/storer');
-const start  = +new Date;
-let stack    = [];
+const ipc      = require('electron').ipcRenderer;
+const store    = require('./js/store');
+const storer   = require('./js/storer');
 
-store.subscribe(function() {
-  console.debug('State is now', store.getState());
-  const state = store.getState();
-
-  if( state.reading || state.map || state.sawdust ) {
-    ignore();
-  } else {
-    listen();
-  }
-
-  storer.saveStack(state.stack);
-})
 const hopper   = require('./components/hopper')(store);
 const map      = require('./components/map')(store);
 const foothold = require('./components/foothold')(store);
@@ -28,18 +14,18 @@ const reader   = require('./components/reader')(store);
 
 function listen() {
   ignore();
-  document.body.addEventListener('keypress', keypress);
-  document.body.addEventListener('keydown', keydown);
-  document.body.addEventListener('keyup', keyup);
+  document.body.addEventListener('keypress', startReading);
+  document.body.addEventListener('keydown', pop);
+  document.body.addEventListener('keyup', shift);
 }
 
 function ignore() {
-  document.body.removeEventListener('keypress', keypress);
-  document.body.removeEventListener('keydown', keydown);
-  document.body.removeEventListener('keyup', keyup);
+  document.body.removeEventListener('keypress', startReading);
+  document.body.removeEventListener('keydown', pop);
+  document.body.removeEventListener('keyup', shift);
 }
 
-function keypress(event) {
+function startReading(event) {
   event.key = event.key || String.fromCharCode(event.keyCode);
   if( !event.key.match(/^[A-z0-9]$/) ) { return; }
 
@@ -47,7 +33,7 @@ function keypress(event) {
   ignore();
 }
 
-function keydown(event) {
+function pop(event) {
   if( event.which == 8 ) { // backspace
     event.preventDefault();
 
@@ -76,22 +62,31 @@ function escape(event) {
   listen();
 }
 
-function keyup(event) {
-  if( event.which == 16 ) { // shift
-    event.preventDefault();
-    ignore();
-    if( event.location === KeyboardEvent.DOM_KEY_LOCATION_RIGHT ) {
-      store.dispatch({type: 'showMap'});
-    } else {
-      store.dispatch({type: 'showSawdust'});
-    }
+function shift(event) {
+  if( event.which != 16 ) { return; }
+  event.preventDefault();
+  ignore();
+  if( event.location === KeyboardEvent.DOM_KEY_LOCATION_RIGHT ) {
+    store.dispatch({type: 'showMap'});
+  } else {
+    store.dispatch({type: 'showSawdust'});
   }
 }
 
-listen();
 document.body.addEventListener('keydown', escape);
 storer.retrieveStack(function(err, savedStack) {
   if( err ) { return console.warn(err); }
   if( !savedStack ) { return; }
   store.dispatch({type: 'loadStack', stack: savedStack});
+})
+
+store.subscribe(function() {
+  console.debug('State is now', store.getState());
+  const state = store.getState();
+
+  if( state.reading || state.map || state.sawdust ) {
+    ignore();
+  } else {
+    listen();
+  }
 })

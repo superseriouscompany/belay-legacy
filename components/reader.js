@@ -27,8 +27,6 @@ function listen() {
     $input.value = '';
     store.dispatch({type: 'stopReading'});
     store.dispatch({type: 'push', task: task});
-    alert("FIXME: save to storer again");
-    // storer.saveStack(stack);
     event.preventDefault();
     return false;
   })
