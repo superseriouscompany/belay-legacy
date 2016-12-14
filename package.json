@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "electron-is-dev": "^0.1.2",
-    "electron-json-storage": "^2.1.0"
+    "electron-json-storage": "^2.1.0",
+    "redux": "^3.6.0"
   }
 }
