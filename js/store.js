@@ -1,5 +1,5 @@
 const redux  = require('redux');
-const storer = require('./storer'); // this feels gross
+const saver  = require('./saver');
 
 function stacker(state, action) {
   console.debug('Dispatched', state, action);
@@ -8,11 +8,11 @@ function stacker(state, action) {
     case 'push':
       if( !action.task ) { console.warn("No task provided to push", action); return state;}
       state.stack.unshift(action.task);
-      storer.saveStack(state.stack);
+      saver.saveStack(state.stack);
       return state;
     case 'pop':
       state.stack.shift();
-      storer.saveStack(state.stack);
+      saver.saveStack(state.stack);
       return state;
     case 'loadStack':
       state.stack = action.stack;
@@ -36,7 +36,7 @@ function stacker(state, action) {
       state.sawdust = false;
       return state;
     case '@@redux/INIT':
-      storer.retrieveStack(function(err, savedStack) {
+      saver.retrieveStack(function(err, savedStack) {
         if( err ) { return console.warn(err); }
         if( !savedStack ) { return; }
         module.exports.dispatch({type: 'loadStack', stack: savedStack});

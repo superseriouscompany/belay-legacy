@@ -1,5 +1,5 @@
 const $sawdust = document.querySelector('.js-sawdust');
-const storer   = require('../js/storer');
+const saver    = require('../js/saver');
 
 let store;
 
@@ -7,7 +7,7 @@ module.exports = function(s) {
   store = s;
   store.subscribe(render);
 
-  storer.retrieveSawdust(function(err, savedSawdust) {
+  saver.retrieveSawdust(function(err, savedSawdust) {
     if( err ) { return console.warn(err); }
     if( savedSawdust ) { $sawdust.value = savedSawdust; }
   })
@@ -23,7 +23,7 @@ function render() {
       if( $sawdust.value && $sawdust.value[$sawdust.value.length-1] != "\n" ) {
         $sawdust.value += "\n";
       }
-      storer.saveSawdust($sawdust.value, function(err) {
+      saver.saveSawdust($sawdust.value, function(err) {
         if( err ) { return console.error(err); }
       })
     }
