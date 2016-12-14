@@ -2,10 +2,9 @@
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
 //
-const input           = document.querySelector('.js-next');
 const timeDisplay     = document.querySelector('.js-timeDisplay');
 const foothold        = document.querySelector('.js-foothold');
-const hint            = document.querySelector('.js-hint');
+const input           = document.querySelector('.js-next');
 const sawdust         = document.querySelector('.js-sawdust');
 const ipc             = require('electron').ipcRenderer;
 const storage         = require('electron-json-storage');
@@ -37,14 +36,12 @@ function listen() {
   document.body.addEventListener('keypress', keypress);
   document.body.addEventListener('keydown', keydown);
   document.body.addEventListener('keyup', keyup);
-  document.body.addEventListener('click', hinter.show);
 }
 
 function ignore() {
   document.body.removeEventListener('keypress', keypress);
   document.body.removeEventListener('keydown', keydown);
   document.body.removeEventListener('keyup', keyup);
-  document.body.removeEventListener('click', hinter.show);
 }
 
 function keypress(event) {
@@ -52,7 +49,6 @@ function keypress(event) {
   if( !event.key.match(/^[A-z0-9]$/) ) { return; }
 
   reader.start();
-  hinter.hide();
   ignore();
 }
 
@@ -62,13 +58,11 @@ function keydown(event) {
 
     hopper.explode(function() {
       stacker.pop();
-      hinter.hide();
     })
     return false;
   } else if( event.which == 27 ) {
     event.preventDefault();
     stacker.abort();
-    hinter.hide();
     store.dispatch({type: 'hideMap'});
   }
 }
@@ -83,21 +77,6 @@ function keyup(event) {
       sawduster.show();
     }
   }
-}
-
-const hinter = {
-  show: function() {
-    hint.style.display = 'block';
-    if( stack.length ) {
-      hint.innerHTML = '(backspace to finish, escape to bail)'
-    } else {
-      hint.innerHTML = '(start typing)'
-    }
-  },
-
-  hide: function() {
-    hint.style.display = 'none';
-  },
 }
 
 let inputLength = 0;
