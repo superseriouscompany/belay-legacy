@@ -8,8 +8,6 @@ const storer          = require('./js/storer');
 const start  = +new Date;
 let stack    = [];
 
-const $sawdust         = document.querySelector('.js-sawdust');
-
 store.subscribe(function() {
   console.debug('State is now', store.getState());
   const state = store.getState();
@@ -19,6 +17,8 @@ store.subscribe(function() {
   } else {
     listen();
   }
+
+  storer.saveStack(state.stack);
 })
 const hopper   = require('./components/hopper')(store);
 const map      = require('./components/map')(store);
@@ -52,7 +52,7 @@ function keydown(event) {
     event.preventDefault();
 
     hopper.explode(function() {
-      stacker.pop();
+      store.dispatch({type: 'pop'});
       listen();
     })
     return false;
@@ -62,9 +62,17 @@ function keydown(event) {
 function escape(event) {
   if( event.which != 27 ) { return; }
   event.preventDefault();
-  stacker.abort();
-  store.dispatch({type: 'hideMap'});
-  store.dispatch({type: 'hideSawdust'});
+
+  const state = store.getState();
+  if( state.map ) {
+    store.dispatch({type: 'hideMap'});
+  } else if( state.sawdust ) {
+    store.dispatch({type: 'hideSawdust'});
+  } else {
+    // eventually this will save records of bailure in the data model
+    store.dispatch({type: 'pop'});
+  }
+
   listen();
 }
 
@@ -77,28 +85,6 @@ function keyup(event) {
     } else {
       store.dispatch({type: 'showSawdust'});
     }
-  }
-}
-
-const stacker = {
-  push: function(name) {
-    if( !name ) { return console.warn("No name provided"); }
-    const task = {start: +new Date, name: name, fontSize: window.getComputedStyle(input)['font-size']}
-    store.dispatch({type: 'stopReading'});
-    store.dispatch({type: 'push', task: task});
-    stack.unshift(task);
-    storer.saveStack(stack);
-  },
-
-  pop: function() {
-    store.dispatch({type: 'pop'});
-    stack.shift();
-    storer.saveStack(stack);
-  },
-
-  abort: function() {
-    // eventually this will save records of bailure in the data model
-    stacker.pop();
   }
 }
 
