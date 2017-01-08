@@ -53,6 +53,8 @@ function escape(event) {
     store.dispatch({type: 'hideMap'});
   } else if( state.sawdust ) {
     store.dispatch({type: 'hideSawdust'});
+  } else if( state.reading ) {
+    store.dispatch({type: 'stopReading'});
   } else {
     // eventually this will save records of bailure in the data model
     store.dispatch({type: 'pop'});

@@ -34,7 +34,6 @@ function listen() {
   $input.addEventListener('keydown', function(event) {
     if( event.which != 27 ) { return; } // ESC
     $input.value = '';
-    store.dispatch({type: 'stopReading'});
   })
 
   $input.addEventListener('change', resize);

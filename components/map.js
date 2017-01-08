@@ -24,6 +24,6 @@ function renderStack(stack) {
     let indentation = '';
     for( var j = 0; j < i; j++ ) { indentation += "--"}
 
-    return `${indentation}${t.name} ${timer.renderTime(t.start).split(' ')[0]}`
+    return `${indentation}${t.name} ${timer.renderTime(t.start).split(' ').slice(0,2).join(' ')}`
   }).join("<br />");
 }
